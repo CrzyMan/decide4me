@@ -1,3 +1,8 @@
+# My additions
+decide4me.komodoproject
+*.sublime-project
+*.sublime-workspace
+
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
