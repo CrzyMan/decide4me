@@ -1,5 +1,5 @@
 # My additions
-decide4me.komodoproject
+*.komodoproject
 *.sublime-project
 *.sublime-workspace
 
