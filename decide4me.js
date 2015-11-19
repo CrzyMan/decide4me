@@ -6,7 +6,7 @@ var Decide4Me = function(){
     // Variables are private to the class, so getters/setters are necesarry
     
     // Code version (public date)
-    this.version = "15.11.18";
+    this.version = "15.11.19";
     
     // whether or not the spinner is spinning
     var spinning = false;
@@ -224,6 +224,15 @@ var Decide4Me = function(){
         ctx_buffer.canvas.width = width;
         ctx_buffer.clearRect(0, 0, width, height);
         
+        // draw circle in case nothing is there
+        /* */
+        ctx_buffer.fillStyle = "white";
+        ctx_buffer.beginPath();
+        ctx_buffer.arc(width/2, height/2, radius, 0, 2*Math.PI);
+        ctx_buffer.closePath();
+        ctx_buffer.stroke();
+        ctx_buffer.fill();
+        /* */
         
         var refAngle = 0;
         var i = 0;
@@ -249,16 +258,6 @@ var Decide4Me = function(){
                 i++;
             }
         }
-        
-        // draw circle in case nothing is there
-        /* */
-        ctx_buffer.fillStyle = "white";
-        ctx_buffer.beginPath();
-        ctx_buffer.arc(width/2, height/2, radius, 0, 2*Math.PI);
-        ctx_buffer.closePath();
-        ctx_buffer.stroke();
-        ctx_buffer.fill();
-        /* */
         
         
         // Manual fix for graphical error where only one option has a line to the middle from the right of the circle
