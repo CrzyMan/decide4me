@@ -1,14 +1,12 @@
-// force image to load so we have the resource
-(function(){
-    var i = new Image();
-    i.src = "arrow.jpg";
-})()
 /**
  * Contructor for a new Spinner and its handler
  */
 var Decide4Me = function(){
     
     // Variables are private to the class, so getters/setters are necesarry
+    
+    // Code version (public date)
+    this.version = "15.11.18";
     
     // whether or not the spinner is spinning
     var spinning = false;
@@ -42,6 +40,7 @@ var Decide4Me = function(){
     
     // Create Arrow
     var arrow = new Image();
+    this.arrow = arrow;
     arrow.src = "arrow.png";
     arrow.classList.add("arrow");
     
@@ -54,8 +53,14 @@ var Decide4Me = function(){
     // The angle for the spinner to approach
     var newAngle = 0;
     
+    // Maximum change in angle per tick
+    var dAngleMax = 0.2;
+    
     // The current angle that the spinner is at
     var currentAngle = 0;
+    
+    // Minimum difference in angle before we just say it is at the same angle
+    var angleProximityThreshold = 0.001;
     
     
     /**
@@ -219,34 +224,40 @@ var Decide4Me = function(){
         ctx_buffer.canvas.width = width;
         ctx_buffer.clearRect(0, 0, width, height);
         
-        // all of the slices
+        
         var refAngle = 0;
         var i = 0;
+        // If there is anything to draw
+        // Draw all of the slices
         for (var option in weights) {
-            // get the color
-            ctx_buffer.fillStyle = weights[option][1];
-            
-            // draw the slice
-            var nextAngle = refAngle + 2*Math.PI*weights[option][0]/size;
-            ctx_buffer.beginPath();
-            ctx_buffer.moveTo(width/2, height/2);
-            ctx_buffer.arc(width/2, height/2, radius, refAngle, nextAngle);
-            ctx_buffer.closePath();
-            ctx_buffer.fill();
-            ctx_buffer.stroke();
-            
-            
-            // get ready for the next slice
-            refAngle = nextAngle;
-            i++;
+            if (weights[option][0] > 0){
+                // get the color
+                ctx_buffer.fillStyle = weights[option][1];
+                
+                // draw the slice
+                var nextAngle = refAngle + 2*Math.PI*weights[option][0]/size;
+                ctx_buffer.beginPath();
+                ctx_buffer.moveTo(width/2, height/2);
+                ctx_buffer.arc(width/2, height/2, radius, refAngle, nextAngle);
+                ctx_buffer.closePath();
+                ctx_buffer.fill();
+                ctx_buffer.stroke();
+                
+                
+                // get ready for the next slice
+                refAngle = nextAngle;
+                i++;
+            }
         }
         
         // draw circle in case nothing is there
         /* */
+        ctx_buffer.fillStyle = "white";
         ctx_buffer.beginPath();
         ctx_buffer.arc(width/2, height/2, radius, 0, 2*Math.PI);
         ctx_buffer.closePath();
         ctx_buffer.stroke();
+        ctx_buffer.fill();
         /* */
         
         
@@ -264,6 +275,7 @@ var Decide4Me = function(){
         }
         // ctx_buffer.clearRect(0, 0, width, height);
         
+        ctx_spinner.clearRect(0, 0, width, height);
         ctx_spinner.drawImage(ctx_buffer.canvas, 0, 0);
     }
     
@@ -296,12 +308,36 @@ var Decide4Me = function(){
     
     
     /**
-     * Get option from the spinner
+     * Get option from the spinner with a random distribution that corresponds to the weighting
      *
      * return {String}  The name of the option
      */
-    this.getRandOption = function(){
-        // selects options with a distribution corresponding to the weights relative to the number of options
+    this.getRandomOption = function(){
+        if (size < 0) {
+            return undefined;
+        }
+        
+        // select a weight within the range
+        var w = Math.random()*size;
+        
+        // The selected option
+        var selected = "";
+        
+        var sumWeight = 0;
+        // Look through the options
+        for (var o in weights) {
+            if (weights[o][0] > 0){
+                sumWeight += weights[o][0];
+                
+                // Check if the weight is within this option
+                if (sumWeight > w) {
+                    return o;
+                }
+            }
+        }
+        
+        // If you get here, it's super weird and w > size I think
+        return undefined;
     }
     
     
@@ -311,21 +347,92 @@ var Decide4Me = function(){
      *
      * param option {String}  The name of the option to spin to
      */
-    this.spinTo = function(option){
-        // find the option
-        // find the angle range
-        // select a value within the range
+    this.spinToOption = function(option){
+        // Don't do anything if already spinning
+        if (spinning || weights[option][0] <= 0) {
+            return;
+        }
+        
+        // Find the weight range
+        var start = 0;
+        var end = 0;
+        
+        for (var o in weights) {
+            // If not the right option
+            if (option != o) {
+                // Keep shifting
+                start += weights[o][0];
+            } else {
+                // If the option, then set the end
+                end  = start + weights[o][0];
+                break;
+            }
+        }
+        
+        // Constant to convert weight to angle
+        var convToAngle = 2*Math.PI/size;
+        
+        // Select a value within the range
+        var angle = (start + Math.random()*(end-start))*convToAngle;
+        
+        // Spin to it yo
+        this.spinToAngle(angle);
     }
     
+    
+    /**
+     * Spin the spinner to a certain angle
+     *
+     * param angle {Number}  The angle to spin to
+     */
+    this.spinToAngle = function(angle) {
+        // make sure that the angle is greater than the current angle by a couple of spins
+        if (angle < currentAngle + Math.PI) {
+            angle += 2*Math.PI*(1 + ~~(Math.random()*2));
+        }
+        
+        nextAngle = angle;
+        
+        // Start the spin
+        spinning = true;
+        window.requestAnimationFrame(this.spinTick.bind(this));
+    }
     
     
     /**
      * Main tick for the spinning animation
      */
     this.spinTick = function(){
-        // initial spinning until you've gone around enough
-        // slow down (linear/cosine) till you get to the determined angle (newAngle)
-        //   this can be initiated at a newAngle-Pi threshold after initial spinning
+        // Initial spinning until you've gone around enough
+        if (currentAngle < nextAngle - Math.PI){
+            currentAngle += dAngleMax;
+        } else {
+            if (currentAngle < nextAngle - angleProximityThreshold) {
+                // Slow down (linear/sinusoidal) till you get to the determined angle (newAngle)
+                // Sinusoidal
+                var scaleFactor = Math.sin(0.5*(nextAngle-currentAngle));
+                
+                currentAngle += dAngleMax*scaleFactor;
+                
+            } else {
+                // Reset current angle with modulus
+                currentAngle = nextAngle%(2*Math.PI);
+                
+                // You've stopped spinning
+                spinning = false;
+                
+                // Call the callback
+                this.onReachAngle();
+            }
+        }
+        
+        // Change the angle of the arrow
+        this.setArrowAngle(currentAngle);
+        
+        // Keep spinning if you have to
+        if (spinning) {
+            window.requestAnimationFrame(this.spinTick.bind(this));
+        }
     }
     
     
@@ -509,6 +616,33 @@ var Decide4Me = function(){
         return null;
     }
     
+    
+    
+    /**
+     * Properly sets the arrow's angle
+     *
+     * param angle {Number}  The new angle of the arrow
+     */
+    this.setArrowAngle = function(angle){
+        arrow.style.transform = "translate(-50%, -50%) rotate("+angle+"rad)";
+    }
+    
+    
+    
+    /**
+     * To be called once the angle has been reached after a spin
+     */
+    this.onReachAngle = function(){
+        // stuff
+        console.log("Angle was reached")
+    }
+    
+    /**
+     * returns whether the spinner is spinning or not
+     */
+    this.isSpinning = function(){
+        return spinning;
+    }
     
     
     // Final setup

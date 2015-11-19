@@ -1,19 +1,25 @@
+body {
+		background-color: #ffffff
+}
+
 header {
-    background-color:grey;
+    background-color:#aaaaaa;
     color:white;
     text-align:center;
     padding:5px;
 		height: 5%;
 }
+
 nav#optionHolder {
     line-height:30px;
-    background-color:#eeeeee;
+    background-color:#dddddd;
     height: 700px;
     width:30%;
     float:left;
     padding:5px;
 		overflow-y: scroll;
 }
+
 section {
     width:65%;
     float:left;
@@ -59,7 +65,7 @@ img.delete {
 		position: absolute;
 		left: 100%;
 		top: 50%;
-		transform: translate(-100%, -50%);
+		transform: translate(-110%, -50%);
 		height: 30px;
 }
 
@@ -80,21 +86,24 @@ input[type=text] {
 }
 
 
-img.arrow{
+img.arrow {
 		position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-		animation-name: spin;
-		animation-duration: 4s;
-		animation-timing-function: ease-out;
 }
 
-@keyframes spin {
-    from {
-        transform:translate(-50%, -50%) rotate(0deg);
-    }
-    to {
-        transform:translate(-50%, -50%) rotate(1000deg);
-    }
+button.spin {
+		font-size: 50pt;
+		margin: 10px;
+}
+
+span.weight {
+		font-size: 20pt;
+		padding-top: 50px;
+}
+
+input[type=number] {
+		font-size: 20pt;
+		margin-top: 10px;
 }
