@@ -3,10 +3,11 @@
 <html>
 <head>
     <title>Decide 4 Me</title>
-    <meta name="version" content="15.11.19" />
+    <meta name="version" content="15.11.21" />
     <link rel="stylesheet" type="text/css" href="dfmStyle.css">
     <script src="Decide4Me.js"></script>
-    <img src="delete_icon.png" hidden></img>
+    <img src="delete_icon.png" hidden />
+    <img src="beta.png" class="beta" onclick="showEmail()"/>
 </head>
 
 <body>
@@ -27,7 +28,7 @@
             <span></span>
             <img class="delete" src="delete_icon.png" onclick="deleteOption(this.parentNode)"/>
             <br/>
-            <span class="weight">Weight: <input type="number" min="0" max="999" value=1 onBlur="keepinItReal(this, this.parentNode.parentNode)" onkeyup="keepinItReal(this, this.parentNode.parentNode)"/></span>
+            <span class="weight">Weight: <input type="number" min="0" max="999" value=1 step="any" onBlur="keepinItReal(this, this.parentNode.parentNode)" onkeyup="keepinItReal(this, this.parentNode.parentNode)" onchange="keepinItReal(this, this.parentNode.parentNode)"/></span>
         </div>
         <!-- -->
     </nav>
@@ -64,7 +65,7 @@ function addNewOption(name) {
     i_newOption.focus();
     
     // Don't do anything if still spinning
-    if (dfm.isSpinning()) return;
+    if (dfm.isSpinning()) return false;
     
     // if no name is given, grab from the option input
     if (typeof name == "undefined") {
@@ -135,12 +136,21 @@ function deleteOption(option) {
  * param elem_option {Element}  The div of the option containing elem_input
  */
 function keepinItReal(elem_input, elem_option) {
+    // Get the numeric value from the input
     var val = parseFloat(elem_input.value);
-    val = val<elem_input.min?elem_input.min:val>elem_input.max?elem_input.max:val;
-    elem_input.value = val;
     
+    // limit it to the range
+    val = val<elem_input.min?elem_input.min:val>elem_input.max?elem_input.max:val;
+    
+    // if the last thing is a decimal, don't change the text in the input
+    if ( "." != elem_input.value[elem_input.value.length-1]) {
+        elem_input.value = val;
+    }
+    
+    // set the weight of the option
     dfm.setOptionWeight(elem_option.dataset.name, val);
     
+    // update the chart
     dfm.updateBg();
 }
 
@@ -151,6 +161,21 @@ function keepinItReal(elem_input, elem_option) {
  */
 function spinBabySpin() {
     dfm.spinToOption(dfm.getRandomOption());
+}
+
+/**
+ * Bring up the email with recipient/subject/basic content already filled
+ */
+function showEmail() {
+    var e = document.createElement('a');
+    var recipient = "whitehts@rose-hulman.edu";
+    var subject = "Decide4Me feedback";
+    var body = "What I think is good:%0D%0A  1. %0D%0A  2. %0D%0A  3. %0D%0A%0D%0A"
+              +"What I think isn't good:%0D%0A  1. %0D%0A  2. %0D%0A  3. %0D%0A%0D%0A"
+              +"What changes I think should be made:%0D%0A  1. %0D%0A  2. %0D%0A  3.  %0D%0A%0D%0A"
+              +"Other Comments:%0D%0A";
+    e.href = "mailto:"+recipient+"?subject="+subject+"&body="+body;
+    e.click();
 }
 </script>
 

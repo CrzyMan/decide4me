@@ -6,7 +6,7 @@ var Decide4Me = function(){
     // Variables are private to the class, so getters/setters are necesarry
     
     // Code version (public date)
-    this.version = "15.11.19";
+    this.version = "15.11.21";
     
     // whether or not the spinner is spinning
     var spinning = false;

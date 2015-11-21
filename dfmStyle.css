@@ -107,3 +107,11 @@ input[type=number] {
 		font-size: 20pt;
 		margin-top: 10px;
 }
+
+img.beta {
+		width: 120px;
+		position: fixed;
+		left: 0;
+		top: 0;
+		z-index: 100;
+}
