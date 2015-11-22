@@ -11,32 +11,45 @@
 </head>
 
 <body>
-    <header>
-        <img src="arrow.png" height="50px">
-        <button class="spin" onclick="spinBabySpin()">Decide For Me</button>
-        <img src="arrow.png" height="50px" style="transform: rotate(180deg)">
-    </header>
     
-    <nav id="optionHolder"><br/>
-        <center style="font-size: 40pt;">Options</center><br/>
-        <form onSubmit="addNewOption(); return false;">
-            <div class="newOption"><input id="i_newOption" type="text" autofocus=true placeholder="New Option" /><img class="delete" src="add.png" onclick="addNewOption()"/></div>
-        </form>
-        
-        <!-- this is the template and will not be displayed -->
-        <div id="optionTemplate" class="optionDisplay" hidden=true>
-            <span></span>
-            <img class="delete" src="delete_icon.png" onclick="deleteOption(this.parentNode)"/>
-            <br/>
-            <span class="weight">Weight: <input type="number" min="0" max="999" value=1 step="any" onBlur="keepinItReal(this, this.parentNode.parentNode)" onkeyup="keepinItReal(this, this.parentNode.parentNode)" onchange="keepinItReal(this, this.parentNode.parentNode)"/></span>
-        </div>
-        <!-- -->
-    </nav>
-    
-    <section>
-        <div id="spinnerHolder"></div>
-    </section>
-
+    <table>
+        <tbody>
+            <tr class="top">
+                <td colspan="2">
+                    <!-- --<header><!-- -->
+                        <center>
+                            <img src="arrow.png" height="50px">
+                            <button class="spin" onclick="spinBabySpin()">Decide For Me</button>
+                            <img src="arrow.png" height="50px" style="transform: rotate(180deg)">
+                        </center>
+                    <!-- --</header><!-- -->
+                </td>
+            </tr>
+            <tr class="bottom">
+                <td class="left" style="position: relative; vertical-align: top;">
+                    <div style="position: absolute; top: 0; bottom: 20px; left: 0; right: 0;">
+                        <center><span style="font-size: 40pt">Options</span></center>
+                        <form onSubmit="addNewOption(); return false;">
+                            <div class="newOption"><input id="i_newOption" type="text" autofocus=true placeholder="New Option" /><img class="delete" src="add.png" onclick="addNewOption()"/></div>
+                        </form>
+                        
+                        <!-- this is the template and will not be displayed -->
+                        <div id="optionTemplate" class="optionDisplay" hidden=true>
+                            <span></span>
+                            <img class="delete" src="delete_icon.png" onclick="deleteOption(this.parentNode)"/>
+                            <br/>
+                            <span class="weight">Weight: <input type="number" min="0" max="999" value=1 step="any" onBlur="keepinItReal(this, this.parentNode.parentNode)" onkeyup="keepinItReal(this, this.parentNode.parentNode)" onchange="keepinItReal(this, this.parentNode.parentNode)"/></span>
+                        </div>
+                        <!-- -->
+                        <div id="optionHolder"></div>
+                    </div>
+                </td>
+                <td class="right">
+                    <div id="spinnerHolder"></div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 <script>
 
 // Make references to DOM elements
@@ -46,12 +59,20 @@ var optionHolder = document.getElementById('optionHolder');
 
 // Start the Spinner handler
 var dfm = new Decide4Me();
-dfm.setHeight(700);
-dfm.setRadius(340);
-
+resizeDFM();
 // Add the spinner to the holder
 dfm.addTo(document.getElementById('spinnerHolder'));
 
+
+/**
+ * Updates the size of the dfm with the resizing of the window
+ */
+function resizeDFM() {
+    var size = window.innerHeight<window.innerWidth?window.innerHeight:window.innerWidth;
+    dfm.setHeight(size*700/950);
+    dfm.setRadius(size*340/950);
+}
+window.onresize = resizeDFM;
 
 
 /**

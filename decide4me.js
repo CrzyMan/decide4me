@@ -551,6 +551,11 @@ var Decide4Me = function(){
         // error catch r
         r = r>=0?r:0;
         radius = r;
+        
+        // update arrow size
+        arrow.style.width = 2*r + "px";
+        
+        // update chart
         this.updateBg();
     }
     
