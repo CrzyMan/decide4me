@@ -6,7 +6,7 @@ var Decide4Me = function(){
     // Variables are private to the class, so getters/setters are necesarry
     
     // Code version (public date)
-    this.version = "15.11.22.A";
+    this.version = "15.11.24";
     
     // whether or not the spinner is spinning
     var spinning = false;
@@ -44,6 +44,18 @@ var Decide4Me = function(){
     arrow.src = "arrow.png";
     arrow.classList.add("arrow");
     
+    // Create selection Display
+    var selectionDisplay = document.createElement('div');
+    selectionDisplay.style.color = "white";
+    selectionDisplay.style.position = "absolute";
+    selectionDisplay.style.top = "50%";
+    selectionDisplay.style.left = "50%";
+    selectionDisplay.style.transform = "translate(-50%, -50%)";
+    selectionDisplay.style.fontSize = "100pt";
+    selectionDisplay.style.textShadow = "1px 1px 0 black, -1px 1px 0 black, 1px -1px 0 black, -1px -1px 0 black";
+    selectionDisplay.style.opacity = "0.0";
+    selectionDisplay.style.textAlign = "center";
+    
     // The options container
     var weights = {};
     
@@ -72,6 +84,7 @@ var Decide4Me = function(){
         //parent.style.position = "relative";
         parent.appendChild(ctx_spinner.canvas);
         parent.appendChild(arrow);
+        parent.appendChild(selectionDisplay);
     }
     
     
@@ -219,6 +232,9 @@ var Decide4Me = function(){
      * Draws a new background to the buffer and saves it as the canvas' background
      */
     this.updateBg = function(){
+        // Make sure the selection text is hidden
+        this.hideSelection();
+        
         // clear buffer
         ctx_buffer.canvas.height = height;
         ctx_buffer.canvas.width = width;
@@ -369,10 +385,10 @@ var Decide4Me = function(){
         }
         
         // Constant to convert weight to angle
-        var convToAngle = 2*Math.PI/size;
+        var convWeightToAngle = 2*Math.PI/size;
         
         // Select a value within the range
-        var angle = (start + Math.random()*(end-start))*convToAngle;
+        var angle = (start + Math.random()*(end-start))*convWeightToAngle;
         
         // Spin to it yo
         this.spinToAngle(angle);
@@ -385,9 +401,13 @@ var Decide4Me = function(){
      * param angle {Number}  The angle to spin to
      */
     this.spinToAngle = function(angle) {
+        
+        // Hide the selection display
+        this.hideSelection();
+        
         // make sure that the angle is greater than the current angle by a couple of spins
         if (angle < currentAngle + Math.PI) {
-            angle += 2*Math.PI*(1 + ~~(Math.random()*2));
+            angle += 2*Math.PI*(2 + ~~(Math.random()*2));
         }
         
         nextAngle = angle;
@@ -552,6 +572,9 @@ var Decide4Me = function(){
         r = r>=0?r:0;
         radius = r;
         
+        // update the font size of the selection
+        selectionDisplay.style.fontSize = (r*100/340)+"pt";
+        
         // update arrow size
         arrow.style.width = 2*r + "px";
         
@@ -639,7 +662,15 @@ var Decide4Me = function(){
     this.onReachAngle = function(){
         // stuff
         console.log("Angle was reached")
+        
+        // Set the selection display
+        selectionDisplay.innerHTML = this.getCurrentOption();
+        
+        // Show the selection
+        this.showSelection();
     }
+    
+    
     
     /**
      * returns whether the spinner is spinning or not
@@ -647,6 +678,52 @@ var Decide4Me = function(){
     this.isSpinning = function(){
         return spinning;
     }
+    
+    
+    
+    /**
+     * Gets the option that the current angle is over
+     *
+     * return {String}  The name of the option the angle is currently over
+     */
+    this.getCurrentOption = function(){
+        // Constant to convert weight to angle
+        var convWeightToAngle = 2*Math.PI/size;
+        
+        var refAngle = currentAngle%(2*Math.PI);
+        
+        var angleSum = 0;
+        for (var o in weights){
+            angleSum += weights[o][0]*convWeightToAngle;
+            
+            if (angleSum > refAngle) {
+                return o;
+            }
+        }
+        
+        return null;
+    }
+    
+    
+    
+    /**
+     * Turns on the selection display
+     */
+    this.showSelection = function(){
+        selectionDisplay.classList.remove("selectionDisplayOff");
+        selectionDisplay.classList.add("selectionDisplayOn");
+    }
+    
+    
+    
+    /**
+     * Hides the selection display
+     */
+    this.hideSelection = function(){
+        selectionDisplay.classList.remove("selectionDisplayOn");
+        selectionDisplay.classList.add("selectionDisplayOff");
+    }
+    
     
     
     // Final setup

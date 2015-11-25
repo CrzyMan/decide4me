@@ -1,3 +1,4 @@
+/* Version 15.11.25 */
 body {
 		background-color: #ffffff;
 		padding: 0px;
@@ -153,4 +154,32 @@ table {
 
 tbody {
 		height: 100%;
+}
+
+div.selectionDisplayOn {
+		animation: slctDispOn 0.5s ease forwards;
+}
+
+@keyframes slctDispOn {
+		0% {
+				opacity: 0.0;
+		}
+		
+		100%{
+				opacity: 1.0;
+		}
+}
+
+div.selectionDisplayOff {
+		animation: slctDispOff 0.5s ease forwards;
+}
+
+@keyframes slctDispOff {
+		0% {
+				opacity: 1.0;
+		}
+		
+		100%{
+				opacity: 0.0;
+		}
 }

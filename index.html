@@ -3,7 +3,7 @@
 <html>
 <head>
     <title>Decide 4 Me</title>
-    <meta name="version" content="15.11.22.A" />
+    <meta name="version" content="15.11.24" />
     <link rel="stylesheet" type="text/css" href="dfmStyle.css">
     <script src="Decide4Me.js"></script>
     <img src="delete_icon.png" hidden />
@@ -181,7 +181,7 @@ function keepinItReal(elem_input, elem_option) {
  * Spins the spinner to an option that was selected at random
  */
 function spinBabySpin() {
-    dfm.spinToOption(dfm.getRandomOption());
+    dfm.spinToAngle(Math.random()*2*Math.PI);
 }
 
 /**
@@ -190,12 +190,19 @@ function spinBabySpin() {
 function showEmail() {
     var e = document.createElement('a');
     var recipient = "whitehts@rose-hulman.edu";
+    var metas = document.getElementsByTagName('meta');
+    var version = "";
+    for (var i in metas){
+        if ("version" == metas[i].name){
+            version = metas[i].content;
+        }
+    }
     var subject = "Decide4Me feedback";
     var body = "What I think is good:%0D%0A  1. %0D%0A  2. %0D%0A  3. %0D%0A%0D%0A"
               +"What I think isn't good:%0D%0A  1. %0D%0A  2. %0D%0A  3. %0D%0A%0D%0A"
               +"What changes I think should be made:%0D%0A  1. %0D%0A  2. %0D%0A  3.  %0D%0A%0D%0A"
               +"Other Comments:%0D%0A";
-    e.href = "mailto:"+recipient+"?subject="+subject+"&body="+body;
+    e.href = "mailto:"+recipient+"?subject="+subject+"&body=Version: "+version+"%0D%0A%0D%0A"+body;
     e.click();
 }
 </script>
